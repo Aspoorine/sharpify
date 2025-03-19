@@ -8,6 +8,7 @@ import {
   DocumentDuplicateIcon,
   ChartPieIcon,
   XMarkIcon,
+  PhotoIcon,
 } from '@heroicons/react/24/outline';
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
@@ -18,7 +19,7 @@ export default function Sidebar() {
   const navigation = [
     { name: 'Dashboard', href: '/', icon: HomeIcon },
     { name: 'Team', href: '/about', icon: UsersIcon },
-    { name: 'Projects', href: '/convert', icon: FolderIcon },
+    { name: 'Conversion', href: '/convert', icon: PhotoIcon },
     { name: 'Calendar', href: '#', icon: CalendarIcon },
     { name: 'Documents', href: '#', icon: DocumentDuplicateIcon },
     { name: 'Reports', href: '#', icon: ChartPieIcon },
