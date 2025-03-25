@@ -8,7 +8,7 @@ import { ToastContainer } from 'react-toastify';
 
 function App() {
   return (
-    <div className="min-h-screen flex bg-gray-100">
+    <div className="min-h-screen flex bg-[#1E293B] ">
       <ToastContainer stacked  />
       <Sidebar />
       <div className="flex-1 flex flex-col">
