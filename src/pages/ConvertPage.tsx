@@ -2,60 +2,72 @@ import { useMutation } from "@tanstack/react-query";
 import React, { useState, ChangeEvent } from "react";
 import { toast } from "react-toastify";
 import { postMedia } from "../services/media";
+import MediaTable from "../components/MediaTable";
+import { v4 as uuidv4 } from "uuid";
+
+type MediaItem = {
+    id: string;
+    name: string;
+    size: string;
+    type: string;
+    file: File;
+    status: "En attente" | "Envoyé" | "Erreur";
+};
+
+const statusStyles = {
+    "En attente": "text-yellow-400 bg-yellow-400/10",
+    Envoyé: "text-green-400 bg-green-400/10",
+    Erreur: "text-rose-400 bg-rose-400/10",
+};
 
 export default function ConvertPage() {
-    const [imageInfo, setImageInfo] = useState<{
-        name: string;
-        size: string;
-        type: string;
-        file: File;
-    } | null>(null);
+    const [mediaList, setMediaList] = useState<MediaItem[]>([]);
 
     const { mutate: uploadMedia } = useMutation({
         mutationFn: postMedia,
         onSuccess: () => {
             notify();
-            setImageInfo(null);
+            setMediaList([]);
         },
         onError: () => {
             toast.error("Erreur lors de l'envoi de l'image.");
         },
     });
 
-    const handleFile = (file: File) => {
-        setImageInfo({
+    const handleFiles = (files: FileList | null) => {
+        if (!files) return;
+        const newItems: MediaItem[] = Array.from(files).map((file) => ({
+            id: uuidv4(),
             name: file.name,
             size: (file.size / 1024).toFixed(2) + " KB",
             type: file.type,
             file,
-        });
+            status: "En attente",
+        }));
+        setMediaList((prev) => [...prev, ...newItems]);
     };
 
     const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            handleFile(file);
-        }
+        handleFiles(e.target.files);
     };
 
     const handleDrop = (e: React.DragEvent<HTMLLabelElement>) => {
         e.preventDefault();
-        const file = e.dataTransfer.files?.[0];
-        if (file) {
-            handleFile(file);
-        }
+        handleFiles(e.dataTransfer.files);
     };
 
     const notify = () => toast("Image envoyée avec succès !");
 
     const handleSubmit = () => {
-        if (imageInfo?.file) {
-            uploadMedia(imageInfo.file);
-        }
+        mediaList.forEach((item) => {
+            if (item.status === "En attente") {
+                uploadMedia(item);
+            }
+        });
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center p-6">
+        <div className="min-h-screen flex flex-col items-center justify-center p-6">
             <div className="w-full max-w-md rounded-2xl p-6">
                 <h2 className="text-xl font-semibold text-white mb-4">
                     Dépose ton image
@@ -89,10 +101,11 @@ export default function ConvertPage() {
                         accept="image/*"
                         onChange={handleFileChange}
                         className="hidden"
+                        multiple
                     />
                 </label>
 
-                {imageInfo && (
+                {/* {imageInfo && (
                     <div className="mt-4 bg-[#334155] rounded-xl p-4 text-sm text-gray-300 space-y-1">
                         <p>
                             <span className="font-semibold text-white">
@@ -120,8 +133,9 @@ export default function ConvertPage() {
                             Envoyer l'image
                         </button>
                     </div>
-                )}
+                )} */}
             </div>
+            <MediaTable />
         </div>
     );
 }
