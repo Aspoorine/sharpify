@@ -4,15 +4,14 @@ import { toast } from "react-toastify";
 import { postMedia } from "../services/media";
 import MediaTable from "../components/MediaTable";
 import { v4 as uuidv4 } from "uuid";
-import { MediaItem, UploadedFile } from "../../type";
-import { downloadAll } from "../utils/download";
+import { ErrorFile, MediaItem, UploadedFile } from "../../type";
+import { checkSize, downloadAll } from "../utils/download";
 
 export default function ConvertPage() {
     const [mediaList, setMediaList] = useState<MediaItem[]>([]);
     const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
-    //_data : réponse du backend au format {message, item }
-    // variables : l'objet passé à mutate
-    // Permet de récupérer la référence et de connaite son status
+    const [errorFiles, setErrorFiles] = useState<ErrorFile[]>([]);
+
     const { mutate: uploadMedia } = useMutation({
         mutationFn: postMedia,
         onSuccess: (data, variables) => {
@@ -28,6 +27,10 @@ export default function ConvertPage() {
         },
         onError: (_data, variables) => {
             updateStatus(variables.id, "Error");
+            setErrorFiles((prev) => [
+                ...prev,
+                { id: variables.id, name: variables.name },
+            ]);
             toast.error(`Erreur lors de l'envoi de ${variables.name}`);
         },
     });
@@ -48,7 +51,7 @@ export default function ConvertPage() {
             file,
             status: "Pending",
         }));
-        setMediaList((prev) => [...prev, ...newItems]);
+        setMediaList((prev) => [...newItems,...prev ]);
     };
 
     const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -107,14 +110,7 @@ export default function ConvertPage() {
                         multiple
                     />
                 </label>
-                {uploadedFiles.length > 0 && (
-                    <button
-                        onClick={() => downloadAll(uploadedFiles)}
-                        className="mt-4 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg transition"
-                    >
-                        Télécharger toutes les images
-                    </button>
-                )}
+
                 {mediaList.length > 0 && (
                     <button
                         onClick={handleSubmit}
@@ -123,7 +119,18 @@ export default function ConvertPage() {
                         Convertir
                     </button>
                 )}
-                <button onClick={() => console.log(mediaList)}>yoyo</button>
+                {checkSize(
+                    mediaList.length,
+                    uploadedFiles.length,
+                    errorFiles.length
+                ) && (
+                    <button
+                        onClick={() => downloadAll(uploadedFiles)}
+                        className=" w-full mt-8 bg-green-600 hover:bg-green-700 text-white py-6 px-4 rounded-lg transition"
+                    >
+                        Télécharger toutes les images en .zip
+                    </button>
+                )}
             </div>
             <MediaTable mediaList={mediaList} />
         </div>

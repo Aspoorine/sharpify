@@ -36,7 +36,7 @@ export default function MediaTable({ mediaList }: MediaTableProps) {
                 </thead>
                 <tbody className="divide-y divide-white/5 text-sm">
                     {mediaList.map((item) => (
-                        <>
+                        
                         <tr key={item.id}>
                             <td className="py-4 pr-8 pl-4 text-white">
                                 {item.name}
@@ -58,7 +58,6 @@ export default function MediaTable({ mediaList }: MediaTableProps) {
                                 </span>
                             </td>                            
                         </tr>
-                        </>
                     ))}
                 </tbody>
             </table>

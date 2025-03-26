@@ -8,3 +8,4 @@ export type MediaItem = {
 };
 
 export type UploadedFile = { filename: string; path: string };
+export type ErrorFile = { id: string; name: string };
