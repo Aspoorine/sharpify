@@ -4,35 +4,39 @@ import { toast } from "react-toastify";
 import { postMedia } from "../services/media";
 import MediaTable from "../components/MediaTable";
 import { v4 as uuidv4 } from "uuid";
-
-type MediaItem = {
-    id: string;
-    name: string;
-    size: string;
-    type: string;
-    file: File;
-    status: "En attente" | "Envoyé" | "Erreur";
-};
-
-const statusStyles = {
-    "En attente": "text-yellow-400 bg-yellow-400/10",
-    Envoyé: "text-green-400 bg-green-400/10",
-    Erreur: "text-rose-400 bg-rose-400/10",
-};
+import { MediaItem, UploadedFile } from "../../type";
+import { downloadAll } from "../utils/download";
 
 export default function ConvertPage() {
     const [mediaList, setMediaList] = useState<MediaItem[]>([]);
-
+    const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
+    //_data : réponse du backend au format {message, item }
+    // variables : l'objet passé à mutate
+    // Permet de récupérer la référence et de connaite son status
     const { mutate: uploadMedia } = useMutation({
         mutationFn: postMedia,
-        onSuccess: () => {
-            notify();
-            setMediaList([]);
+        onSuccess: (data, variables) => {
+            updateStatus(variables.id, "Uploaded");
+            setUploadedFiles((prev) => [
+                ...prev,
+                {
+                    filename: data.file.filename,
+                    path: data.file.path,
+                },
+            ]);
+            toast.success(`${variables.name} envoyée avec succès !`);
         },
-        onError: () => {
-            toast.error("Erreur lors de l'envoi de l'image.");
+        onError: (_data, variables) => {
+            updateStatus(variables.id, "Error");
+            toast.error(`Erreur lors de l'envoi de ${variables.name}`);
         },
     });
+
+    const updateStatus = (id: string, status: MediaItem["status"]) => {
+        setMediaList((prev) =>
+            prev.map((item) => (item.id === id ? { ...item, status } : item))
+        );
+    };
 
     const handleFiles = (files: FileList | null) => {
         if (!files) return;
@@ -42,7 +46,7 @@ export default function ConvertPage() {
             size: (file.size / 1024).toFixed(2) + " KB",
             type: file.type,
             file,
-            status: "En attente",
+            status: "Pending",
         }));
         setMediaList((prev) => [...prev, ...newItems]);
     };
@@ -56,11 +60,10 @@ export default function ConvertPage() {
         handleFiles(e.dataTransfer.files);
     };
 
-    const notify = () => toast("Image envoyée avec succès !");
-
     const handleSubmit = () => {
         mediaList.forEach((item) => {
-            if (item.status === "En attente") {
+            if (item.status === "Pending") {
+                updateStatus(item.id, "Loading");
                 uploadMedia(item);
             }
         });
@@ -68,9 +71,9 @@ export default function ConvertPage() {
 
     return (
         <div className="min-h-screen flex flex-col items-center justify-center p-6">
-            <div className="w-full max-w-md rounded-2xl p-6">
+            <div className="w-full max-w-4xl rounded-2xl p-6">
                 <h2 className="text-xl font-semibold text-white mb-4">
-                    Dépose ton image
+                    Dépose tes images
                 </h2>
                 <label
                     htmlFor="file-upload"
@@ -104,38 +107,25 @@ export default function ConvertPage() {
                         multiple
                     />
                 </label>
-
-                {/* {imageInfo && (
-                    <div className="mt-4 bg-[#334155] rounded-xl p-4 text-sm text-gray-300 space-y-1">
-                        <p>
-                            <span className="font-semibold text-white">
-                                Nom :
-                            </span>{" "}
-                            {imageInfo.name}
-                        </p>
-                        <p>
-                            <span className="font-semibold text-white">
-                                Taille :
-                            </span>{" "}
-                            {imageInfo.size}
-                        </p>
-                        <p>
-                            <span className="font-semibold text-white">
-                                Type :
-                            </span>{" "}
-                            {imageInfo.type}
-                        </p>
-
-                        <button
-                            onClick={handleSubmit}
-                            className="w-full mt-4 bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-lg transition"
-                        >
-                            Envoyer l'image
-                        </button>
-                    </div>
-                )} */}
+                {uploadedFiles.length > 0 && (
+                    <button
+                        onClick={() => downloadAll(uploadedFiles)}
+                        className="mt-4 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg transition"
+                    >
+                        Télécharger toutes les images
+                    </button>
+                )}
+                {mediaList.length > 0 && (
+                    <button
+                        onClick={handleSubmit}
+                        className="w-full mt-4 bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-lg transition"
+                    >
+                        Convertir
+                    </button>
+                )}
+                <button onClick={() => console.log(mediaList)}>yoyo</button>
             </div>
-            <MediaTable />
+            <MediaTable mediaList={mediaList} />
         </div>
     );
 }

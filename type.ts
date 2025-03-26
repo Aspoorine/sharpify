@@ -4,5 +4,7 @@ export type MediaItem = {
     size: string;
     type: string;
     file: File;
-    status: "En attente" | "Envoyé" | "Erreur";
-  };
+    status: "Pending" | "Uploaded" | "Error" | "Loading";
+};
+
+export type UploadedFile = { filename: string; path: string };
