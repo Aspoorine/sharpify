@@ -11,7 +11,6 @@ Ce dépôt correspond à la partie **frontend**, développée avec **React** et 
 - ⚛️ React 18
 - ⚡️ Vite
 - 💨 Tailwind CSS
-- 🪝 React Query / Zustand (si utilisé)
-- 🔒 reCAPTCHA v2/v3 (si utilisé)
-- 📁 Axios pour les appels API
+- 🪝 React Query 
+- 📁 Axios 
 - 🔄 Intégration avec le backend NestJS
