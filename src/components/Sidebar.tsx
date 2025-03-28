@@ -21,7 +21,7 @@ export default function Sidebar() {
     { name: 'Team', href: '/about', icon: UsersIcon },
     { name: 'Conversion', href: '/convert', icon: PhotoIcon },
     { name: 'Calendar', href: '#', icon: CalendarIcon },
-    { name: 'Documents', href: '#', icon: DocumentDuplicateIcon },
+    { name: 'Documents', href: '/documents', icon: DocumentDuplicateIcon },
     { name: 'Reports', href: '#', icon: ChartPieIcon },
   ];
 
@@ -62,7 +62,7 @@ Sidebar.MobileBurger = function MobileBurger() {
     { name: 'Team', href: '/about', icon: UsersIcon },
     { name: 'Projects', href: '/convert', icon: FolderIcon },
     { name: 'Calendar', href: '#', icon: CalendarIcon },
-    { name: 'Documents', href: '#', icon: DocumentDuplicateIcon },
+    { name: 'Documents', href: '/documents', icon: DocumentDuplicateIcon },
     { name: 'Reports', href: '#', icon: ChartPieIcon },
   ];
 

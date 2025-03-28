@@ -15,3 +15,8 @@ export async function postMedia(file: MediaItem): Promise<any> {
     const { data } = await api.post("/media/convert-to-webp", formData, config);
     return data;
 }
+
+export async function getMedias() {
+    const { data } = await api.get("/media");
+    return data;
+}

@@ -5,6 +5,7 @@ import ConvertPage from './pages/ConvertPage';
 import HomePage from './pages/HomePage';
 import Sidebar from './components/Sidebar';
 import { ToastContainer } from 'react-toastify';
+import DocumentsPage from './pages/DocumentsPage';
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/convert" element={<ConvertPage />} />
             <Route path="/about" element={<AboutPage />} />
+            <Route path="/documents" element={<DocumentsPage />} />
           </Routes>
         </div>
       </div>

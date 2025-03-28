@@ -1,3 +1,15 @@
+export type MediaEntityType = {
+    id: string;
+    originalName: string;
+    filename: string;
+    path: string;
+    format: string;
+    size: number;
+    width: number | null;
+    height: number | null;
+    createdAt: string;
+  };  
+
 export type MediaItem = {
     id: string;
     name: string;
