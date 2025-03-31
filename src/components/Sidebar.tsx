@@ -18,11 +18,9 @@ export default function Sidebar() {
 
   const navigation = [
     { name: 'Dashboard', href: '/', icon: HomeIcon },
-    { name: 'Team', href: '/about', icon: UsersIcon },
     { name: 'Conversion', href: '/convert', icon: PhotoIcon },
-    { name: 'Calendar', href: '#', icon: CalendarIcon },
     { name: 'Documents', href: '/documents', icon: DocumentDuplicateIcon },
-    { name: 'Reports', href: '#', icon: ChartPieIcon },
+    { name: 'Reports', href: '/reports', icon: ChartPieIcon },
   ];
 
   return (
@@ -59,11 +57,9 @@ Sidebar.MobileBurger = function MobileBurger() {
 
   const navigation = [
     { name: 'Dashboard', href: '/', icon: HomeIcon },
-    { name: 'Team', href: '/about', icon: UsersIcon },
     { name: 'Projects', href: '/convert', icon: FolderIcon },
-    { name: 'Calendar', href: '#', icon: CalendarIcon },
     { name: 'Documents', href: '/documents', icon: DocumentDuplicateIcon },
-    { name: 'Reports', href: '#', icon: ChartPieIcon },
+    { name: 'Reports', href: '/reports', icon: ChartPieIcon },
   ];
 
   return (

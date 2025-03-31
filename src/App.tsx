@@ -1,11 +1,12 @@
 import { Routes, Route } from 'react-router-dom';
 import './App.css';
-import AboutPage from './pages/AboutPage';
+import AboutPage from './pages/ReportPage';
 import ConvertPage from './pages/ConvertPage';
 import HomePage from './pages/HomePage';
 import Sidebar from './components/Sidebar';
 import { ToastContainer } from 'react-toastify';
 import DocumentsPage from './pages/DocumentsPage';
+import SigninPage from './pages/SigninPage';
 
 function App() {
   return (
@@ -23,8 +24,9 @@ function App() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/convert" element={<ConvertPage />} />
-            <Route path="/about" element={<AboutPage />} />
+            <Route path="/reports" element={<AboutPage />} />
             <Route path="/documents" element={<DocumentsPage />} />
+            <Route path="/signin" element={<SigninPage />} />
           </Routes>
         </div>
       </div>
