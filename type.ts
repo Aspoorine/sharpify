@@ -19,5 +19,10 @@ export type MediaItem = {
     status: "Pending" | "Uploaded" | "Error" | "Loading";
 };
 
+export type MissionType = { 
+    outputType?: "webp" | "avif" | "jpeg" | "png";
+    quality?: number ;
+}
+
 export type UploadedFile = { filename: string; path: string };
 export type ErrorFile = { id: string; name: string };

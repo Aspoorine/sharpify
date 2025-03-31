@@ -4,18 +4,22 @@ import { toast } from "react-toastify";
 import { postMedia } from "../services/media";
 import MediaTable from "../components/MediaTable";
 import { v4 as uuidv4 } from "uuid";
-import { ErrorFile, MediaItem, UploadedFile } from "../../type";
+import { ErrorFile, MediaItem, MissionType, UploadedFile } from "../../type";
 import { checkSize, downloadAll } from "../utils/download";
+import MissionInputs from "../components/MissionInputs";
 
 export default function ConvertPage() {
     const [mediaList, setMediaList] = useState<MediaItem[]>([]);
     const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
     const [errorFiles, setErrorFiles] = useState<ErrorFile[]>([]);
-
+    const [mission, setMission] = useState<MissionType>({
+        quality: 80,
+        outputType: undefined,
+    });
     const { mutate: uploadMedia } = useMutation({
         mutationFn: postMedia,
         onSuccess: (data, variables) => {
-            updateStatus(variables.id, "Uploaded");
+            updateStatus(variables.file.id, "Uploaded");
             setUploadedFiles((prev) => [
                 ...prev,
                 {
@@ -23,15 +27,15 @@ export default function ConvertPage() {
                     path: data.file.path,
                 },
             ]);
-            toast.success(`${variables.name} envoyée avec succès !`);
+            toast.success(`${variables.file.name} envoyée avec succès !`);
         },
         onError: (_data, variables) => {
-            updateStatus(variables.id, "Error");
+            updateStatus(variables.file.id, "Error");
             setErrorFiles((prev) => [
                 ...prev,
-                { id: variables.id, name: variables.name },
+                { id: variables.file.id, name: variables.file.name },
             ]);
-            toast.error(`Erreur lors de l'envoi de ${variables.name}`);
+            toast.error(`Erreur lors de l'envoi de ${variables.file.name}`);
         },
     });
 
@@ -51,7 +55,7 @@ export default function ConvertPage() {
             file,
             status: "Pending",
         }));
-        setMediaList((prev) => [...newItems,...prev ]);
+        setMediaList((prev) => [...newItems, ...prev]);
     };
 
     const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -67,13 +71,17 @@ export default function ConvertPage() {
         mediaList.forEach((item) => {
             if (item.status === "Pending") {
                 updateStatus(item.id, "Loading");
-                uploadMedia(item);
+                uploadMedia({file: item, mission});
             }
         });
     };
 
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center p-6">
+        <div className="flex flex-col items-center justify-center p-6">
+            <MissionInputs
+                mission={mission}
+                setMission={setMission}
+            ></MissionInputs>
             <div className="w-full max-w-4xl rounded-2xl p-6">
                 <h2 className="text-xl font-semibold text-white mb-4">
                     Dépose tes images

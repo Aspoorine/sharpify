@@ -1,12 +1,20 @@
 import { apiService } from "./apiService";
-import { MediaItem } from "../../type";
+import { MediaItem, MissionType } from "../../type";
 
 const api = apiService();
 
-export async function postMedia(file: MediaItem): Promise<any> {
+export async function postMedia({
+    file,
+    mission,
+}: {
+    file: MediaItem;
+    mission: MissionType;
+}): Promise<any> {
     // TODO promise à définir
     const formData = new FormData();
     formData.append("file", file.file);
+    formData.append("mission", JSON.stringify(mission));
+    console.log("formData", formData);
     const config = {
         headers: {
             "content-type": "multipart/form-data",
