@@ -8,7 +8,7 @@ export type MediaEntityType = {
     width: number | null;
     height: number | null;
     createdAt: string;
-  };  
+};
 
 export type MediaItem = {
     id: string;
@@ -19,10 +19,10 @@ export type MediaItem = {
     status: "Pending" | "Uploaded" | "Error" | "Loading";
 };
 
-export type MissionType = { 
+export type MissionType = {
     outputType?: "webp" | "avif" | "jpeg" | "png";
-    quality?: number ;
-}
+    quality?: number;
+    outputSize?: { width: number; height: number };
+};
 
-export type UploadedFile = { filename: string; path: string };
 export type ErrorFile = { id: string; name: string };

@@ -4,13 +4,15 @@ import { toast } from "react-toastify";
 import { postMedia } from "../services/media";
 import MediaTable from "../components/MediaTable";
 import { v4 as uuidv4 } from "uuid";
-import { ErrorFile, MediaItem, MissionType, UploadedFile } from "../../type";
+import { ErrorFile, MediaEntityType, MediaItem, MissionType } from "../../type";
 import { checkSize, downloadAll } from "../utils/download";
 import MissionInputs from "../components/MissionInputs";
 
 export default function ConvertPage() {
     const [mediaList, setMediaList] = useState<MediaItem[]>([]);
-    const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
+    const [uploadedFiles, setUploadedFiles] = useState<MediaEntityType[]>([]);
+    console.log("data", uploadedFiles);
+
     const [errorFiles, setErrorFiles] = useState<ErrorFile[]>([]);
     const [mission, setMission] = useState<MissionType>({
         quality: 80,
@@ -23,8 +25,15 @@ export default function ConvertPage() {
             setUploadedFiles((prev) => [
                 ...prev,
                 {
+                    id: data.file.id,
+                    originalName: data.file.originalName,
                     filename: data.file.filename,
                     path: data.file.path,
+                    format: data.file.format,
+                    size: data.file.size,
+                    width: data.file.width,
+                    height: data.file.height,
+                    createdAt: data.file.createdAt,
                 },
             ]);
             toast.success(`${variables.file.name} envoyée avec succès !`);
@@ -71,7 +80,7 @@ export default function ConvertPage() {
         mediaList.forEach((item) => {
             if (item.status === "Pending") {
                 updateStatus(item.id, "Loading");
-                uploadMedia({file: item, mission});
+                uploadMedia({ file: item, mission });
             }
         });
     };
