@@ -1,225 +1,184 @@
-import { useMutation } from "@tanstack/react-query";
-import React, { useState, ChangeEvent, useRef } from "react";
-import { toast } from "react-toastify";
-import { postMedia } from "../services/media";
+import React from "react";
+import ConversionLogic from "../components/ConversionLogic";
+import ConversionSettings from "../components/ConversionSettings";
+import DropZone from "../components/DropZone";
+import ConvertButton from "../components/ConvertButton";
 import MediaTable from "../components/MediaTable";
-import { v4 as uuidv4 } from "uuid";
-import { ErrorFile, MediaEntityType, MediaItem, MissionType } from "../../type";
 import { checkSize, downloadAll } from "../utils/download";
-import MissionInputs from "../components/MissionInputs";
+import {
+    ArrowDownTrayIcon,
+    DocumentDuplicateIcon,
+} from "@heroicons/react/24/outline";
 
+// Page principale de conversion d'images
+// Orchestration du workflow de conversion : sélection, configuration, upload, feedback utilisateur
 export default function ConvertPage() {
-    const [mediaList, setMediaList] = useState<MediaItem[]>([]);
-    const [uploadedFiles, setUploadedFiles] = useState<MediaEntityType[]>([]);
-    const [errorFiles, setErrorFiles] = useState<ErrorFile[]>([]);
-    const toastShownRef = useRef(false);
-    const [mission, setMission] = useState<MissionType>({
-        quality: 80,
-        outputType: undefined,
-    });
-
-    const checkAllUploadsComplete = (currentMediaList: MediaItem[]) => {
-        const allProcessed = currentMediaList.every(
-            (item) => item.status === "Uploaded" || item.status === "Error"
-        );
-
-        console.log("Checking uploads:", {
-            allProcessed,
-            length: currentMediaList.length,
-            toastShown: toastShownRef.current,
-            statuses: currentMediaList.map((item) => ({
-                id: item.id,
-                status: item.status,
-            })),
-        });
-
-        if (
-            allProcessed &&
-            currentMediaList.length > 0 &&
-            !toastShownRef.current
-        ) {
-            const successCount = currentMediaList.filter(
-                (item) => item.status === "Uploaded"
-            ).length;
-            const errorCount = currentMediaList.filter(
-                (item) => item.status === "Error"
-            ).length;
-
-            console.log("Showing toast:", { successCount, errorCount });
-
-            if (errorCount === 0) {
-                toast.success(
-                    `Tous les fichiers (${successCount}) ont été envoyés avec succès !`
-                );
-            } else {
-                toast.success(
-                    `${successCount} fichiers envoyés avec succès, ${errorCount} erreurs. Vérifiez les détails.`
-                );
-            }
-            toastShownRef.current = true;
-        }
-    };
-
-    const { mutate: uploadMedia } = useMutation({
-        mutationFn: postMedia,
-        onSuccess: (data, variables) => {
-            setUploadedFiles((prev) => [
-                ...prev,
-                {
-                    id: data.file.id,
-                    originalName: data.file.originalName,
-                    filename: data.file.filename,
-                    path: data.file.path,
-                    format: data.file.format,
-                    size: data.file.size,
-                    width: data.file.width,
-                    height: data.file.height,
-                    createdAt: data.file.createdAt,
-                },
-            ]);
-
-            setMediaList((prev) => {
-                const updatedList = prev.map((item) =>
-                    item.id === variables.file.id
-                        ? { ...item, status: "Uploaded" as const }
-                        : item
-                );
-                // Vérifier si tous les uploads sont terminés après cette mise à jour
-                setTimeout(() => {
-                    checkAllUploadsComplete(updatedList);
-                }, 0);
-                return updatedList;
-            });
-        },
-        onError: (_data, variables) => {
-            setErrorFiles((prev) => [
-                ...prev,
-                { id: variables.file.id, name: variables.file.name },
-            ]);
-
-            setMediaList((prev) => {
-                const updatedList = prev.map((item) =>
-                    item.id === variables.file.id
-                        ? { ...item, status: "Error" as const }
-                        : item
-                );
-                // Vérifier si tous les uploads sont terminés après cette mise à jour
-                setTimeout(() => {
-                    checkAllUploadsComplete(updatedList);
-                }, 0);
-                return updatedList;
-            });
-        },
-    });
-
-    const updateStatus = (id: string, status: MediaItem["status"]) => {
-        setMediaList((prev) =>
-            prev.map((item) => (item.id === id ? { ...item, status } : item))
-        );
-    };
-
-    const handleFiles = (files: FileList | null) => {
-        if (!files) return;
-        const newItems: MediaItem[] = Array.from(files).map((file) => ({
-            id: uuidv4(),
-            name: file.name,
-            size: (file.size / 1024).toFixed(2) + " KB",
-            type: file.type,
-            file,
-            status: "Pending",
-        }));
-        setMediaList((prev) => [...newItems, ...prev]);
-    };
-
-    const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-        handleFiles(e.target.files);
-    };
-
-    const handleDrop = (e: React.DragEvent<HTMLLabelElement>) => {
-        e.preventDefault();
-        handleFiles(e.dataTransfer.files);
-    };
-
-    const handleSubmit = () => {
-        const pendingItems = mediaList.filter(
-            (item) => item.status === "Pending"
-        );
-
-        // Réinitialiser le flag du toast pour un nouveau batch d'uploads
-        toastShownRef.current = false;
-        console.log("Starting new batch with", pendingItems.length, "items");
-
-        pendingItems.forEach((item) => {
-            updateStatus(item.id, "Loading");
-            uploadMedia({ file: item, mission });
-        });
-    };
-
     return (
-        <div className="flex flex-col items-center justify-center p-6">
-            <MissionInputs
-                mission={mission}
-                setMission={setMission}
-            ></MissionInputs>
-            <div className="w-full max-w-4xl rounded-2xl p-6">
-                <h2 className="text-xl font-semibold text-white mb-4">
-                    Dépose tes images
-                </h2>
-                <label
-                    htmlFor="file-upload"
-                    onDrop={handleDrop}
-                    onDragOver={(e) => e.preventDefault()}
-                    className="flex flex-col items-center justify-center border-2 border-dashed border-gray-600 rounded-xl p-8 cursor-pointer hover:border-indigo-500 transition"
-                >
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-12 w-12 text-gray-400 mb-2"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                    >
-                        <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M7 16V4m0 0l-4 4m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"
-                        />
-                    </svg>
-                    <p className="text-gray-400">
-                        Clique ou glisse une image ici
-                    </p>
-                    <input
-                        id="file-upload"
-                        type="file"
-                        accept="image/*"
-                        onChange={handleFileChange}
-                        className="hidden"
-                        multiple
-                    />
-                </label>
-
-                {mediaList.length > 0 && (
-                    <button
-                        onClick={handleSubmit}
-                        className="w-full mt-4 bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-lg transition"
-                    >
-                        Convertir
-                    </button>
-                )}
-                {checkSize(
+        // Fournit toute la logique métier via un render prop
+        <ConversionLogic>
+            {({
+                mediaList, // Liste des fichiers à convertir (avec leur statut)
+                uploadedFiles, // Liste des fichiers convertis avec succès
+                errorFiles, // Liste des fichiers en erreur
+                mission, // Paramètres de conversion (qualité, format...)
+                setMission, // Setter pour les paramètres
+                handleFiles, // Handler pour ajout de fichiers
+                handleSubmit, // Handler pour lancer la conversion
+                isUploading, // Booléen : upload en cours ?
+            }) => {
+                // Nombre de fichiers en attente de conversion
+                const pendingCount = mediaList.filter(
+                    (item) => item.status === "Pending"
+                ).length;
+                // Peut-on activer le bouton de téléchargement ?
+                const canDownload = checkSize(
                     mediaList.length,
                     uploadedFiles.length,
                     errorFiles.length
-                ) && (
-                    <button
-                        onClick={() => downloadAll(uploadedFiles)}
-                        className=" w-full mt-8 bg-green-600 hover:bg-green-700 text-white py-6 px-4 rounded-lg transition"
-                    >
-                        Télécharger toutes les images en .zip
-                    </button>
-                )}
-            </div>
-            <MediaTable mediaList={mediaList} />
-        </div>
+                );
+
+                return (
+                    // Layout principal avec background et padding
+                    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 pt-16 pb-8 px-2">
+                        <div className="container mx-auto">
+                            {/* Header */}
+                            <div className="text-center mb-12">
+                                <h1 className="text-4xl font-bold text-white mb-4">
+                                    Conversion d'images
+                                </h1>
+                                <p className="text-xl text-gray-400 max-w-2xl mx-auto">
+                                    Optimisez et convertissez vos images avec la
+                                    puissance de Sharp
+                                </p>
+                            </div>
+
+                            {/* 1. Paramètres de conversion (format, qualité) */}
+                            <ConversionSettings
+                                mission={mission}
+                                setMission={setMission}
+                            />
+
+                            {/* 2. Zone de drop/upload d'images */}
+                            <div className="mb-8">
+                                <DropZone
+                                    onFilesSelected={handleFiles}
+                                    isUploading={isUploading}
+                                />
+                            </div>
+
+                            {/* 3. Bouton pour lancer la conversion */}
+                            <div className="mb-8">
+                                <ConvertButton
+                                    onClick={handleSubmit}
+                                    disabled={isUploading}
+                                    isUploading={isUploading}
+                                    fileCount={pendingCount}
+                                />
+                            </div>
+
+                            {/* 4. Bouton de téléchargement du zip si conversion terminée */}
+                            {canDownload && (
+                                <div className="mb-8">
+                                    <div className="w-full max-w-4xl mx-auto">
+                                        <button
+                                            onClick={() =>
+                                                downloadAll(uploadedFiles)
+                                            }
+                                            className="w-full py-6 px-8 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-bold rounded-xl transition-all duration-300 hover:shadow-xl hover:shadow-green-500/25 transform hover:scale-105"
+                                        >
+                                            <div className="flex items-center justify-center gap-3">
+                                                <ArrowDownTrayIcon className="h-6 w-6" />
+                                                <span className="text-lg">
+                                                    Télécharger toutes les
+                                                    images (
+                                                    {uploadedFiles.length})
+                                                </span>
+                                            </div>
+                                        </button>
+
+                                        <div className="mt-4 text-center">
+                                            <div className="inline-flex items-center gap-2 text-sm text-gray-400 bg-gray-800/50 px-4 py-2 rounded-full">
+                                                <DocumentDuplicateIcon className="h-4 w-4" />
+                                                <span>
+                                                    Fichiers convertis prêts au
+                                                    téléchargement
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* 5. Tableau de suivi des fichiers (statut, nom, etc.) */}
+                            {mediaList.length > 0 && (
+                                <div className="w-full max-w-6xl mx-auto">
+                                    <MediaTable mediaList={mediaList} />
+                                </div>
+                            )}
+
+                            {/* 6. Statistiques rapides sur le batch en cours */}
+                            {mediaList.length > 0 && (
+                                <div className="mt-12">
+                                    <div className="w-full max-w-4xl mx-auto">
+                                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                            <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-4 border border-gray-700/50">
+                                                <div className="text-2xl font-bold text-white mb-1">
+                                                    {mediaList.length}
+                                                </div>
+                                                <div className="text-sm text-gray-400">
+                                                    Total
+                                                </div>
+                                            </div>
+                                            <div className="bg-blue-900/20 backdrop-blur-sm rounded-xl p-4 border border-blue-500/30">
+                                                <div className="text-2xl font-bold text-blue-400 mb-1">
+                                                    {
+                                                        mediaList.filter(
+                                                            (item) =>
+                                                                item.status ===
+                                                                "Loading"
+                                                        ).length
+                                                    }
+                                                </div>
+                                                <div className="text-sm text-gray-400">
+                                                    En cours
+                                                </div>
+                                            </div>
+                                            <div className="bg-green-900/20 backdrop-blur-sm rounded-xl p-4 border border-green-500/30">
+                                                <div className="text-2xl font-bold text-green-400 mb-1">
+                                                    {
+                                                        mediaList.filter(
+                                                            (item) =>
+                                                                item.status ===
+                                                                "Uploaded"
+                                                        ).length
+                                                    }
+                                                </div>
+                                                <div className="text-sm text-gray-400">
+                                                    Succès
+                                                </div>
+                                            </div>
+                                            <div className="bg-red-900/20 backdrop-blur-sm rounded-xl p-4 border border-red-500/30">
+                                                <div className="text-2xl font-bold text-red-400 mb-1">
+                                                    {
+                                                        mediaList.filter(
+                                                            (item) =>
+                                                                item.status ===
+                                                                "Error"
+                                                        ).length
+                                                    }
+                                                </div>
+                                                <div className="text-sm text-gray-400">
+                                                    Erreurs
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                );
+            }}
+        </ConversionLogic>
     );
 }

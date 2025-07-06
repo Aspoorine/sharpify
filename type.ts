@@ -20,9 +20,11 @@ export type MediaItem = {
 };
 
 export type MissionType = {
-    outputType?: "webp" | "avif" | "jpeg" | "png";
+    outputType?: OutputType;
     quality?: number;
     outputSize?: { width: number; height: number };
 };
+
+export type OutputType = "webp" | "avif" | "jpeg" | "png";
 
 export type ErrorFile = { id: string; name: string };

@@ -20,7 +20,7 @@ function App() {
         
 
         {/* Content */}
-        <div className="flex-1 p-8">
+        <div className="flex-1 ">
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/convert" element={<ConvertPage />} />
