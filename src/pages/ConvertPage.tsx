@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import React, { useState, ChangeEvent } from "react";
+import React, { useState, ChangeEvent, useRef } from "react";
 import { toast } from "react-toastify";
 import { postMedia } from "../services/media";
 import MediaTable from "../components/MediaTable";
@@ -11,17 +11,58 @@ import MissionInputs from "../components/MissionInputs";
 export default function ConvertPage() {
     const [mediaList, setMediaList] = useState<MediaItem[]>([]);
     const [uploadedFiles, setUploadedFiles] = useState<MediaEntityType[]>([]);
-    console.log("data", uploadedFiles);
-
     const [errorFiles, setErrorFiles] = useState<ErrorFile[]>([]);
+    const toastShownRef = useRef(false);
     const [mission, setMission] = useState<MissionType>({
         quality: 80,
         outputType: undefined,
     });
+
+    const checkAllUploadsComplete = (currentMediaList: MediaItem[]) => {
+        const allProcessed = currentMediaList.every(
+            (item) => item.status === "Uploaded" || item.status === "Error"
+        );
+
+        console.log("Checking uploads:", {
+            allProcessed,
+            length: currentMediaList.length,
+            toastShown: toastShownRef.current,
+            statuses: currentMediaList.map((item) => ({
+                id: item.id,
+                status: item.status,
+            })),
+        });
+
+        if (
+            allProcessed &&
+            currentMediaList.length > 0 &&
+            !toastShownRef.current
+        ) {
+            const successCount = currentMediaList.filter(
+                (item) => item.status === "Uploaded"
+            ).length;
+            const errorCount = currentMediaList.filter(
+                (item) => item.status === "Error"
+            ).length;
+
+            console.log("Showing toast:", { successCount, errorCount });
+
+            if (errorCount === 0) {
+                toast.success(
+                    `Tous les fichiers (${successCount}) ont été envoyés avec succès !`
+                );
+            } else {
+                toast.success(
+                    `${successCount} fichiers envoyés avec succès, ${errorCount} erreurs. Vérifiez les détails.`
+                );
+            }
+            toastShownRef.current = true;
+        }
+    };
+
     const { mutate: uploadMedia } = useMutation({
         mutationFn: postMedia,
         onSuccess: (data, variables) => {
-            updateStatus(variables.file.id, "Uploaded");
             setUploadedFiles((prev) => [
                 ...prev,
                 {
@@ -36,15 +77,38 @@ export default function ConvertPage() {
                     createdAt: data.file.createdAt,
                 },
             ]);
-            toast.success(`${variables.file.name} envoyée avec succès !`);
+
+            setMediaList((prev) => {
+                const updatedList = prev.map((item) =>
+                    item.id === variables.file.id
+                        ? { ...item, status: "Uploaded" as const }
+                        : item
+                );
+                // Vérifier si tous les uploads sont terminés après cette mise à jour
+                setTimeout(() => {
+                    checkAllUploadsComplete(updatedList);
+                }, 0);
+                return updatedList;
+            });
         },
         onError: (_data, variables) => {
-            updateStatus(variables.file.id, "Error");
             setErrorFiles((prev) => [
                 ...prev,
                 { id: variables.file.id, name: variables.file.name },
             ]);
-            toast.error(`Erreur lors de l'envoi de ${variables.file.name}`);
+
+            setMediaList((prev) => {
+                const updatedList = prev.map((item) =>
+                    item.id === variables.file.id
+                        ? { ...item, status: "Error" as const }
+                        : item
+                );
+                // Vérifier si tous les uploads sont terminés après cette mise à jour
+                setTimeout(() => {
+                    checkAllUploadsComplete(updatedList);
+                }, 0);
+                return updatedList;
+            });
         },
     });
 
@@ -77,11 +141,17 @@ export default function ConvertPage() {
     };
 
     const handleSubmit = () => {
-        mediaList.forEach((item) => {
-            if (item.status === "Pending") {
-                updateStatus(item.id, "Loading");
-                uploadMedia({ file: item, mission });
-            }
+        const pendingItems = mediaList.filter(
+            (item) => item.status === "Pending"
+        );
+
+        // Réinitialiser le flag du toast pour un nouveau batch d'uploads
+        toastShownRef.current = false;
+        console.log("Starting new batch with", pendingItems.length, "items");
+
+        pendingItems.forEach((item) => {
+            updateStatus(item.id, "Loading");
+            uploadMedia({ file: item, mission });
         });
     };
 
