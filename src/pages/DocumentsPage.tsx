@@ -3,6 +3,8 @@ import { getMedias } from "../services/media";
 import { MediaEntityType } from "../../type";
 import { ArrowDownTrayIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { formatDateToShortString } from "../utils/formatDateToString";
+import { useState } from "react";
+import DeleteModal from "../components/DeleteModal";
 
 export default function DocumentsPage() {
   const { data: files, isSuccess } = useQuery({
@@ -10,7 +12,12 @@ export default function DocumentsPage() {
     queryFn: () => getMedias(),
   });
 
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
   return (
+    <>
+    <DeleteModal open={isDeleteModalOpen} setOpen={setIsDeleteModalOpen} />
+
     <ul
       role="list"
       className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8"
@@ -52,16 +59,20 @@ export default function DocumentsPage() {
 
                 <button
                   onClick={() => {
-                    console.log("Suppression"); // TODO: ajouter suppression 
+                    console.log("Suppression"); // TODO: ajouter suppression
                   }}
                   className="flex items-center justify-center bg-white/10 hover:bg-red-500/70 text-white p-2 rounded-md transition"
                 >
-                  <TrashIcon className="h-5 w-5" />
+                  <TrashIcon
+                    onClick={() => setIsDeleteModalOpen(true)}
+                    className="h-5 w-5"
+                  />
                 </button>
               </div>
             </div>
           </li>
         ))}
     </ul>
+    </>
   );
 }

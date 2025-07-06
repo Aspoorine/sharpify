@@ -1,14 +1,12 @@
 import { Dialog } from '@headlessui/react';
 import {
   Bars3Icon,
-  HomeIcon,
-  UsersIcon,
-  FolderIcon,
-  CalendarIcon,
-  DocumentDuplicateIcon,
   ChartPieIcon,
-  XMarkIcon,
+  DocumentDuplicateIcon,
+  FolderIcon,
+  HomeIcon,
   PhotoIcon,
+  XMarkIcon
 } from '@heroicons/react/24/outline';
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
