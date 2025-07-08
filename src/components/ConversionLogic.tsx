@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo } from "react";
 import { toast } from "react-toastify";
 import { postMedia } from "../services/media";
 import { v4 as uuidv4 } from "uuid";
@@ -16,6 +16,7 @@ export interface ConversionLogicProps {
         handleSubmit: () => void;
         isUploading: boolean;
         uploadProgress: { [key: string]: number };
+        maxImageDimensions?: { width: number; height: number };
     }) => React.ReactNode;
 }
 
@@ -39,6 +40,35 @@ export default function ConversionLogic({ children }: ConversionLogicProps) {
         quality: 80,
         outputType: "webp",
     });
+
+    // Calcul des dimensions maximales des images sélectionnées
+    const maxImageDimensions = useMemo(() => {
+        if (mediaList.length === 0) return undefined;
+
+        let maxWidth = 0;
+        let maxHeight = 0;
+
+        // Fonction pour obtenir les dimensions d'une image
+        const getImageDimensions = (
+            file: File
+        ): Promise<{ width: number; height: number }> => {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => {
+                    resolve({ width: img.width, height: img.height });
+                };
+                img.onerror = () => {
+                    resolve({ width: 0, height: 0 });
+                };
+                img.src = URL.createObjectURL(file);
+            });
+        };
+
+        // Pour l'instant, on retourne undefined car on ne peut pas calculer les dimensions
+        // de manière synchrone. On pourrait implémenter un système de cache ou
+        // calculer les dimensions lors de l'ajout des fichiers.
+        return undefined;
+    }, [mediaList]);
 
     // Vérifie si tous les fichiers ont été traités (succès ou erreur) et affiche un toast global
     const checkAllUploadsComplete = (currentMediaList: MediaItem[]) => {
@@ -191,6 +221,7 @@ export default function ConversionLogic({ children }: ConversionLogicProps) {
                 handleSubmit,
                 isUploading,
                 uploadProgress,
+                maxImageDimensions,
             })}
         </>
     );

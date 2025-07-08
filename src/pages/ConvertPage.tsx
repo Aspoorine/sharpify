@@ -25,6 +25,7 @@ export default function ConvertPage() {
                 handleFiles, // Handler pour ajout de fichiers
                 handleSubmit, // Handler pour lancer la conversion
                 isUploading, // Booléen : upload en cours ?
+                maxImageDimensions, // Dimensions maximales des images sélectionnées
             }) => {
                 // Nombre de fichiers en attente de conversion
                 const pendingCount = mediaList.filter(
@@ -40,7 +41,7 @@ export default function ConvertPage() {
                 return (
                     // Layout principal avec background et padding
                     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 pt-16 pb-8 px-2">
-                        <div className="container mx-auto">
+                        <div className="container mx-auto max-w-4xl">
                             {/* Header */}
                             <div className="text-center mb-12">
                                 <h1 className="text-4xl font-bold text-white mb-4">
@@ -56,6 +57,7 @@ export default function ConvertPage() {
                             <ConversionSettings
                                 mission={mission}
                                 setMission={setMission}
+                                maxImageDimensions={maxImageDimensions}
                             />
 
                             {/* 2. Zone de drop/upload d'images */}
@@ -111,7 +113,7 @@ export default function ConvertPage() {
 
                             {/* 5. Tableau de suivi des fichiers (statut, nom, etc.) */}
                             {mediaList.length > 0 && (
-                                <div className="w-full max-w-6xl mx-auto">
+                                <div className="w-full max-w-4xl mx-auto">
                                     <MediaTable mediaList={mediaList} />
                                 </div>
                             )}
