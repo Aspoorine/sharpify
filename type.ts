@@ -22,7 +22,7 @@ export type MediaItem = {
 export type MissionType = {
     outputType?: OutputType;
     quality?: number;
-    outputSize?: { width: number; height: number };
+    maxOutputSize?: { width: number; height: number };
 };
 
 export type OutputType = "webp" | "avif" | "jpeg" | "png";

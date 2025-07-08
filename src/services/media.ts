@@ -3,10 +3,10 @@ import { MediaEntityType, MediaItem, MissionType } from "../../type";
 
 const api = apiService();
 
-export type PostMediaResponse = { 
-    message:string;
-    file : MediaEntityType
-}
+export type PostMediaResponse = {
+    message: string;
+    file: MediaEntityType;
+};
 export async function postMedia({
     file,
     mission,
@@ -22,7 +22,7 @@ export async function postMedia({
             "content-type": "multipart/form-data",
         },
     };
-    const { data } = await api.post("/media/convert-to-webp", formData, config);
+    const { data } = await api.post("/media/convert", formData, config);
     return data;
 }
 
