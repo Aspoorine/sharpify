@@ -1,12 +1,11 @@
 import { apiService } from "./apiService";
 import { MediaEntityType, MediaItem, MissionType } from "../../type";
 
-const api = apiService();
-
 export type PostMediaResponse = {
     message: string;
     file: MediaEntityType;
 };
+
 export async function postMedia({
     file,
     mission,
@@ -22,11 +21,15 @@ export async function postMedia({
             "content-type": "multipart/form-data",
         },
     };
-    const { data } = await api.post("/media/convert", formData, config);
+    const { data } = await apiService.instance.post(
+        "/media/convert",
+        formData,
+        config
+    );
     return data;
 }
 
 export async function getMedias() {
-    const { data } = await api.get("/media");
+    const { data } = await apiService.instance.get("/media");
     return data;
 }
