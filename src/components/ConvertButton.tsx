@@ -76,7 +76,7 @@ export default function ConvertButton({
     };
 
     return (
-        <div className={`w-full max-w-4xl mx-auto ${className}`}>
+        <div className={`w-full max-w-5xl mx-auto ${className}`}>
             <button
                 onClick={onClick}
                 disabled={disabled || fileCount === 0 || isUploading}

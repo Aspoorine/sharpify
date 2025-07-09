@@ -55,7 +55,7 @@ export default function DropZone({
     };
 
     return (
-        <div className="w-full max-w-4xl mx-auto">
+        <div className="w-full max-w-5xl mx-auto">
             <div
                 className={`relative group transition-all duration-300 ${
                     isDragOver ? "scale-105" : "hover:scale-[1.02]"

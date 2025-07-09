@@ -85,7 +85,7 @@ export default function MediaTable({ mediaList }: MediaTableProps) {
     if (mediaList.length === 0) return null;
 
     return (
-        <div className="w-full max-w-4xl mx-auto">
+        <div className="w-full max-w-5xl mx-auto">
             <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl border border-gray-700/50 overflow-hidden">
                 {/* Header du tableau */}
                 <div className="px-6 py-4 border-b border-gray-700/50">

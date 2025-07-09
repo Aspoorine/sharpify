@@ -41,7 +41,7 @@ export default function ConvertPage() {
                 return (
                     // Layout principal avec background et padding
                     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 pt-16 pb-8 px-2">
-                        <div className="container mx-auto max-w-4xl">
+                        <div className="container mx-auto max-w-6xl">
                             {/* Header */}
                             <div className="text-center mb-12">
                                 <h1 className="text-4xl font-bold text-white mb-4">
@@ -81,7 +81,7 @@ export default function ConvertPage() {
                             {/* 4. Bouton de téléchargement du zip si conversion terminée */}
                             {canDownload && (
                                 <div className="mb-8">
-                                    <div className="w-full max-w-4xl mx-auto">
+                                    <div className="w-full max-w-5xl mx-auto">
                                         <button
                                             onClick={() =>
                                                 downloadAll(uploadedFiles)
@@ -113,7 +113,7 @@ export default function ConvertPage() {
 
                             {/* 5. Tableau de suivi des fichiers (statut, nom, etc.) */}
                             {mediaList.length > 0 && (
-                                <div className="w-full max-w-4xl mx-auto">
+                                <div className="w-full max-w-5xl mx-auto">
                                     <MediaTable mediaList={mediaList} />
                                 </div>
                             )}
@@ -121,7 +121,7 @@ export default function ConvertPage() {
                             {/* 6. Statistiques rapides sur le batch en cours */}
                             {mediaList.length > 0 && (
                                 <div className="mt-12">
-                                    <div className="w-full max-w-4xl mx-auto">
+                                    <div className="w-full max-w-5xl mx-auto">
                                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                                             <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-4 border border-gray-700/50">
                                                 <div className="text-2xl font-bold text-white mb-1">

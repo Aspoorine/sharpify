@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, useRef, useMemo } from "react";
 import { toast } from "react-toastify";
-import { postMedia } from "../services/media";
+import { postMedia, checkStorageForFile } from "../services/media";
 import { v4 as uuidv4 } from "uuid";
 import { ErrorFile, MediaEntityType, MediaItem, MissionType } from "../../type";
 
@@ -196,19 +196,54 @@ export default function ConversionLogic({ children }: ConversionLogicProps) {
     };
 
     // Lance la conversion de tous les fichiers en attente
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         const pendingItems = mediaList.filter(
             (item) => item.status === "Pending"
         );
 
+        if (pendingItems.length === 0) return;
+
         toastShownRef.current = false;
 
-        pendingItems.forEach((item) => {
-            updateStatus(item.id, "Loading");
-            // Simule la progression (peut être amélioré pour du vrai progress)
-            setUploadProgress((prev) => ({ ...prev, [item.id]: 0 }));
-            uploadMedia({ file: item, mission });
-        });
+        // Calculer la taille totale des fichiers en attente
+        const totalSize = pendingItems.reduce(
+            (sum, item) => sum + item.file.size,
+            0
+        );
+
+        try {
+            // Vérifier la limite de stockage
+            const storageCheck = await checkStorageForFile(totalSize);
+
+            if (!storageCheck.canUpload) {
+                toast.error(
+                    `Limite de stockage dépassée ! Vous avez ${storageCheck.currentSize} utilisés sur ${storageCheck.limit}. ` +
+                        `Il vous reste ${storageCheck.remainingSpace} d'espace disponible.`
+                );
+                return;
+            }
+
+            // Si on peut uploader, lancer les conversions
+            pendingItems.forEach((item) => {
+                updateStatus(item.id, "Loading");
+                // Simule la progression (peut être amélioré pour du vrai progress)
+                setUploadProgress((prev) => ({ ...prev, [item.id]: 0 }));
+                uploadMedia({ file: item, mission });
+            });
+
+            // Afficher un toast informatif sur l'espace restant
+            if (storageCheck.usagePercentage > 75) {
+                toast.warning(
+                    `Attention : Vous utilisez ${storageCheck.usagePercentage}% de votre espace de stockage. ` +
+                        `Il vous restera ${storageCheck.remainingSpace} après cet upload.`
+                );
+            }
+        } catch (error) {
+            console.error("Erreur lors de la vérification du stockage:", error);
+            toast.error(
+                "Erreur lors de la vérification de l'espace de stockage"
+            );
+        }
     };
 
     // Passe tous les états et handlers aux enfants (UI)

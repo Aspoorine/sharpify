@@ -1,7 +1,16 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getMedias, deleteMedia, deleteAllMedias } from "../services/media";
+import {
+    getMedias,
+    deleteMedia,
+    deleteAllMedias,
+    getStorageInfo,
+} from "../services/media";
 import { MediaEntityType } from "../../type";
-import { ArrowDownTrayIcon, TrashIcon } from "@heroicons/react/24/outline";
+import {
+    ArrowDownTrayIcon,
+    TrashIcon,
+    CloudIcon,
+} from "@heroicons/react/24/outline";
 import { formatDateToShortString } from "../utils/formatDateToString";
 import { downloadSingle } from "../utils/download";
 import { useState } from "react";
@@ -14,6 +23,11 @@ export default function DocumentsPage() {
         queryFn: () => getMedias(),
     });
 
+    const { data: storageInfo } = useQuery({
+        queryKey: ["storage-info"],
+        queryFn: () => getStorageInfo(),
+    });
+
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [isDeleteAllModalOpen, setIsDeleteAllModalOpen] = useState(false);
     const [selectedMediaId, setSelectedMediaId] = useState<string | null>(null);
@@ -23,6 +37,7 @@ export default function DocumentsPage() {
         mutationFn: deleteMedia,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["medias"] });
+            queryClient.invalidateQueries({ queryKey: ["storage-info"] });
         },
     });
 
@@ -31,6 +46,7 @@ export default function DocumentsPage() {
         mutationFn: deleteAllMedias,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["medias"] });
+            queryClient.invalidateQueries({ queryKey: ["storage-info"] });
         },
     });
 
@@ -73,6 +89,63 @@ export default function DocumentsPage() {
                         Gérez et téléchargez vos images converties
                     </p>
                 </div>
+
+                {/* Informations de stockage */}
+                {storageInfo && (
+                    <div className="mb-8">
+                        <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/50">
+                            <div className="flex items-center justify-between mb-4">
+                                <div className="flex items-center gap-3">
+                                    <CloudIcon className="h-6 w-6 text-blue-400" />
+                                    <h3 className="text-lg font-semibold text-white">
+                                        Espace de stockage
+                                    </h3>
+                                </div>
+                                <div className="text-right">
+                                    <div className="text-2xl font-bold text-white">
+                                        {storageInfo.currentSize}
+                                    </div>
+                                    <div className="text-sm text-gray-400">
+                                        sur {storageInfo.limit}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Barre de progression */}
+                            <div className="mb-3">
+                                <div className="flex justify-between text-sm text-gray-400 mb-1">
+                                    <span>Utilisation</span>
+                                    <span>{storageInfo.usagePercentage}%</span>
+                                </div>
+                                <div className="w-full bg-gray-700 rounded-full h-2">
+                                    <div
+                                        className={`h-2 rounded-full transition-all duration-300 ${
+                                            storageInfo.usagePercentage > 90
+                                                ? "bg-red-500"
+                                                : storageInfo.usagePercentage >
+                                                  75
+                                                ? "bg-yellow-500"
+                                                : "bg-blue-500"
+                                        }`}
+                                        style={{
+                                            width: `${Math.min(
+                                                storageInfo.usagePercentage,
+                                                100
+                                            )}%`,
+                                        }}
+                                    ></div>
+                                </div>
+                            </div>
+
+                            <div className="text-sm text-gray-400">
+                                Espace restant :{" "}
+                                <span className="text-white font-medium">
+                                    {storageInfo.remainingSpace}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 {/* Bouton pour supprimer tous les médias */}
                 {isSuccess && files.length > 0 && (
