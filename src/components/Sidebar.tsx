@@ -1,18 +1,16 @@
 import { Dialog } from "@headlessui/react";
 import {
+    ArrowRightOnRectangleIcon,
     Bars3Icon,
     ChartPieIcon,
     DocumentDuplicateIcon,
-    FolderIcon,
     HomeIcon,
     PhotoIcon,
-    XMarkIcon,
-    ArrowRightOnRectangleIcon,
+    XMarkIcon
 } from "@heroicons/react/24/outline";
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
-import { User } from "../types/auth";
 
 export default function Sidebar() {
     const location = useLocation();

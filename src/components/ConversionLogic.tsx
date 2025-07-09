@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState, useRef, useMemo } from "react";
+import { useMemo, useRef, useState } from "react";
 import { toast } from "react-toastify";
-import { postMedia, checkStorageForFile } from "../services/media";
 import { v4 as uuidv4 } from "uuid";
 import { ErrorFile, MediaEntityType, MediaItem, MissionType } from "../../type";
+import { checkStorageForFile, postMedia } from "../services/media";
 
 export interface ConversionLogicProps {
     children: (props: {
@@ -45,24 +45,21 @@ export default function ConversionLogic({ children }: ConversionLogicProps) {
     const maxImageDimensions = useMemo(() => {
         if (mediaList.length === 0) return undefined;
 
-        let maxWidth = 0;
-        let maxHeight = 0;
-
         // Fonction pour obtenir les dimensions d'une image
-        const getImageDimensions = (
-            file: File
-        ): Promise<{ width: number; height: number }> => {
-            return new Promise((resolve) => {
-                const img = new Image();
-                img.onload = () => {
-                    resolve({ width: img.width, height: img.height });
-                };
-                img.onerror = () => {
-                    resolve({ width: 0, height: 0 });
-                };
-                img.src = URL.createObjectURL(file);
-            });
-        };
+        // const getImageDimensions = (
+        //     file: File
+        // ): Promise<{ width: number; height: number }> => {
+        //     return new Promise((resolve) => {
+        //         const img = new Image();
+        //         img.onload = () => {
+        //             resolve({ width: img.width, height: img.height });
+        //         };
+        //         img.onerror = () => {
+        //             resolve({ width: 0, height: 0 });
+        //         };
+        //         img.src = URL.createObjectURL(file);
+        //     });
+        // };
 
         // Pour l'instant, on retourne undefined car on ne peut pas calculer les dimensions
         // de manière synchrone. On pourrait implémenter un système de cache ou

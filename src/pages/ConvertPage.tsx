@@ -1,14 +1,13 @@
-import React from "react";
-import ConversionLogic from "../components/ConversionLogic";
-import ConversionSettings from "../components/ConversionSettings";
-import DropZone from "../components/DropZone";
-import ConvertButton from "../components/ConvertButton";
-import MediaTable from "../components/MediaTable";
-import { checkSize, downloadAll } from "../utils/download";
 import {
     ArrowDownTrayIcon,
     DocumentDuplicateIcon,
 } from "@heroicons/react/24/outline";
+import ConversionLogic from "../components/ConversionLogic";
+import ConversionSettings from "../components/ConversionSettings";
+import ConvertButton from "../components/ConvertButton";
+import DropZone from "../components/DropZone";
+import MediaTable from "../components/MediaTable";
+import { checkSize, downloadAll } from "../utils/download";
 
 // Page principale de conversion d'images
 // Orchestration du workflow de conversion : sélection, configuration, upload, feedback utilisateur
