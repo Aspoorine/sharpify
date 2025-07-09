@@ -33,3 +33,13 @@ export async function getMedias() {
     const { data } = await apiService.instance.get("/media");
     return data;
 }
+
+export async function deleteMedia(id: string) {
+    const { data } = await apiService.instance.delete(`/media/${id}`);
+    return data;
+}
+
+export async function deleteAllMedias() {
+    const { data } = await apiService.instance.delete("/media");
+    return data;
+}

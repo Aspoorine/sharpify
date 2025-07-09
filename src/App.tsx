@@ -11,18 +11,8 @@ import SigninPage from "./pages/SigninPage";
 import { useAuth } from "./hooks/useAuth";
 import ProtectedRoute from "./components/ProtectedRoute";
 
-// Configuration de TanStack Query
-const queryClient = new QueryClient({
-    defaultOptions: {
-        queries: {
-            staleTime: 5 * 60 * 1000, // 5 minutes
-            retry: 1,
-        },
-    },
-});
-
 // Composant principal de l'application
-function AppContent() {
+function App() {
     const { isAuthenticated } = useAuth();
 
     return (
@@ -76,12 +66,5 @@ function AppContent() {
     );
 }
 
-function App() {
-    return (
-        <QueryClientProvider client={queryClient}>
-            <AppContent />
-        </QueryClientProvider>
-    );
-}
 
 export default App;

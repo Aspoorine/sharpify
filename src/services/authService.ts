@@ -22,4 +22,10 @@ export const authService = {
         const response = await apiService.instance.get("/auth/me");
         return response.data;
     },
+
+    // Méthodes de gestion du token (délégation vers apiService)
+    setToken: apiService.setToken,
+    getToken: apiService.getToken,
+    removeToken: apiService.removeToken,
+    isAuthenticated: apiService.isAuthenticated,
 };

@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, useRef, useMemo } from "react";
 import { toast } from "react-toastify";
 import { postMedia } from "../services/media";
@@ -101,6 +101,7 @@ export default function ConversionLogic({ children }: ConversionLogicProps) {
             toastShownRef.current = true;
         }
     };
+    const queryClient = useQueryClient();
 
     // Mutation React Query pour envoyer un fichier au backend
     const { mutate: uploadMedia, isPending: isUploading } = useMutation({
@@ -141,6 +142,8 @@ export default function ConversionLogic({ children }: ConversionLogicProps) {
                 delete newProgress[variables.file.id];
                 return newProgress;
             });
+
+            queryClient.invalidateQueries({ queryKey: ["medias"] });
         },
         onError: (_data, variables) => {
             // Ajoute le fichier à la liste des erreurs
