@@ -1,12 +1,10 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 
 export default function SigninPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const { login, isLoggingIn } = useAuth();
-    const navigate = useNavigate();
 
     // Gestion de la soumission du formulaire
     const handleSubmit = async (e: React.FormEvent) => {

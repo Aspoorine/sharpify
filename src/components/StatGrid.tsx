@@ -10,7 +10,7 @@ const fakeStats = [
   
   export default function StatGrid() {
 
-    const { data: stats, isSuccess } = useQuery({
+    const { data: stats } = useQuery({
         queryKey: ["stats"],
         queryFn: () => getStats(),
       });

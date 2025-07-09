@@ -20,7 +20,6 @@ type DeleteModalProps = {
 export default function DeleteModal({
     open,
     setOpen,
-    mediaId,
     onConfirm,
     isDeleteAll = false,
 }: DeleteModalProps) {
