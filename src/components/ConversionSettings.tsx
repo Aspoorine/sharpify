@@ -151,143 +151,6 @@ export default function ConversionSettings({
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-end">
-                    {/* Sélection du format de sortie */}
-                    <div className="space-y-4 flex flex-col justify-between h-full flex-1">
-                        <div className="flex flex-col h-full">
-                            <div className="flex items-center gap-2 mb-2">
-                                <PhotoIcon className="h-5 w-5 text-indigo-400" />
-                                <h3 className="text-lg font-medium text-white">
-                                    Format de sortie
-                                </h3>
-                            </div>
-                            <div className="flex-1 flex flex-col justify-between">
-                                <div className="grid grid-cols-2 gap-3 h-full flex-1">
-                                    {formatOptions.map((format) => (
-                                        <button
-                                            key={format.value}
-                                            onClick={() =>
-                                                setMission({
-                                                    ...mission,
-                                                    outputType:
-                                                        format.value as OutputType,
-                                                })
-                                            }
-                                            className={buttonClass(
-                                                mission.outputType ===
-                                                    format.value
-                                            )}
-                                            style={{ height: "100%" }}
-                                        >
-                                            <div className="text-center space-y-2 flex flex-col justify-center h-full">
-                                                <div className="text-2xl">
-                                                    {format.icon}
-                                                </div>
-                                                <div className="font-medium text-white">
-                                                    {format.label}
-                                                </div>
-                                                <div className="text-xs text-gray-400 leading-tight">
-                                                    {format.description}
-                                                </div>
-                                            </div>
-                                        </button>
-                                    ))}
-                                </div>
-                                <div className="flex-1 flex items-end mt-4">
-                                    <div className="invisible">
-                                        Conseil Sharp
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Sélection de la qualité (presets + slider) */}
-                    <div className="space-y-4 flex flex-col justify-between h-full">
-                        <div>
-                            <div className="flex items-center gap-2 mb-2">
-                                <SparklesIcon className="h-5 w-5 text-green-400" />
-                                <h3 className="text-lg font-medium text-white">
-                                    Qualité d'optimisation
-                                </h3>
-                            </div>
-                            <div className="grid grid-cols-2 gap-3 mb-4">
-                                {qualityPresets.map((preset) => (
-                                    <button
-                                        key={preset.value}
-                                        onClick={() =>
-                                            setMission({
-                                                ...mission,
-                                                quality: preset.value,
-                                            })
-                                        }
-                                        className={buttonClass(
-                                            mission.quality === preset.value
-                                        )}
-                                    >
-                                        <span className="font-medium">
-                                            {preset.label}
-                                        </span>
-                                        <span className="text-xs text-gray-400 mt-1">
-                                            {preset.value}%
-                                        </span>
-                                    </button>
-                                ))}
-                            </div>
-                            <div className="space-y-3">
-                                <div className="flex justify-between items-center">
-                                    <span className="text-sm text-gray-400">
-                                        Qualité personnalisée
-                                    </span>
-                                    <span className="text-sm font-medium text-white">
-                                        {mission.quality}%
-                                    </span>
-                                </div>
-                                <input
-                                    type="range"
-                                    min="1"
-                                    max="100"
-                                    value={mission.quality}
-                                    onChange={(e) =>
-                                        setMission({
-                                            ...mission,
-                                            quality: parseInt(e.target.value),
-                                        })
-                                    }
-                                    className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
-                                    style={{
-                                        background: `linear-gradient(to right, #10b981 0%, #10b981 ${mission.quality}%, #374151 ${mission.quality}%, #374151 100%)`,
-                                    }}
-                                />
-                                <div className="flex justify-between text-xs text-gray-500">
-                                    <span>Minimal</span>
-                                    <span>Maximal</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-3 mt-4">
-                            <div className="flex items-start gap-2">
-                                <InformationCircleIcon className="h-4 w-4 text-blue-400 mt-0.5 flex-shrink-0" />
-                                <div className="text-xs text-blue-300">
-                                    <p className="font-medium mb-1">
-                                        Conseil Sharp :
-                                    </p>
-                                    <p>
-                                        {(mission.quality ?? 80) <= 60 &&
-                                            "Qualité optimisée pour le web - fichiers très légers"}
-                                        {(mission.quality ?? 80) > 60 &&
-                                            (mission.quality ?? 80) <= 80 &&
-                                            "Qualité équilibrée - parfaite pour la plupart des usages"}
-                                        {(mission.quality ?? 80) > 80 &&
-                                            (mission.quality ?? 80) <= 90 &&
-                                            "Haute qualité - idéal pour l'impression ou l'archivage"}
-                                        {(mission.quality ?? 80) > 90 &&
-                                            "Qualité maximale - préservation parfaite des détails"}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
                     {/* Configuration de la taille maximale */}
                     <div className="space-y-4 flex flex-col justify-between h-full">
                         <div>
@@ -433,6 +296,142 @@ export default function ConversionSettings({
                                         plus petites que la taille max ne sont
                                         pas agrandies.
                                     </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {/* Sélection de la qualité (presets + slider) */}
+                    <div className="space-y-4 flex flex-col justify-between h-full">
+                        <div>
+                            <div className="flex items-center gap-2 mb-2">
+                                <SparklesIcon className="h-5 w-5 text-green-400" />
+                                <h3 className="text-lg font-medium text-white">
+                                    Qualité d'optimisation
+                                </h3>
+                            </div>
+                            <div className="grid grid-cols-2 gap-3 mb-4">
+                                {qualityPresets.map((preset) => (
+                                    <button
+                                        key={preset.value}
+                                        onClick={() =>
+                                            setMission({
+                                                ...mission,
+                                                quality: preset.value,
+                                            })
+                                        }
+                                        className={buttonClass(
+                                            mission.quality === preset.value
+                                        )}
+                                    >
+                                        <span className="font-medium">
+                                            {preset.label}
+                                        </span>
+                                        <span className="text-xs text-gray-400 mt-1">
+                                            {preset.value}%
+                                        </span>
+                                    </button>
+                                ))}
+                            </div>
+                            <div className="space-y-3">
+                                <div className="flex justify-between items-center">
+                                    <span className="text-sm text-gray-400">
+                                        Qualité personnalisée
+                                    </span>
+                                    <span className="text-sm font-medium text-white">
+                                        {mission.quality}%
+                                    </span>
+                                </div>
+                                <input
+                                    type="range"
+                                    min="1"
+                                    max="100"
+                                    value={mission.quality}
+                                    onChange={(e) =>
+                                        setMission({
+                                            ...mission,
+                                            quality: parseInt(e.target.value),
+                                        })
+                                    }
+                                    className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                                    style={{
+                                        background: `linear-gradient(to right, #10b981 0%, #10b981 ${mission.quality}%, #374151 ${mission.quality}%, #374151 100%)`,
+                                    }}
+                                />
+                                <div className="flex justify-between text-xs text-gray-500">
+                                    <span>Minimal</span>
+                                    <span>Maximal</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-3 mt-4">
+                            <div className="flex items-start gap-2">
+                                <InformationCircleIcon className="h-4 w-4 text-blue-400 mt-0.5 flex-shrink-0" />
+                                <div className="text-xs text-blue-300">
+                                    <p className="font-medium mb-1">
+                                        Conseil Sharp :
+                                    </p>
+                                    <p>
+                                        {(mission.quality ?? 80) <= 60 &&
+                                            "Qualité optimisée pour le web - fichiers très légers"}
+                                        {(mission.quality ?? 80) > 60 &&
+                                            (mission.quality ?? 80) <= 80 &&
+                                            "Qualité équilibrée - parfaite pour la plupart des usages"}
+                                        {(mission.quality ?? 80) > 80 &&
+                                            (mission.quality ?? 80) <= 90 &&
+                                            "Haute qualité - idéal pour l'impression ou l'archivage"}
+                                        {(mission.quality ?? 80) > 90 &&
+                                            "Qualité maximale - préservation parfaite des détails"}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Sélection du format de sortie */}
+                    <div className="space-y-4 flex flex-col justify-between h-full flex-1">
+                        <div className="flex flex-col h-full">
+                            <div className="flex items-center gap-2 mb-2">
+                                <PhotoIcon className="h-5 w-5 text-indigo-400" />
+                                <h3 className="text-lg font-medium text-white">
+                                    Format de sortie
+                                </h3>
+                            </div>
+                            <div className="flex-1 flex flex-col justify-between">
+                                <div className="grid grid-cols-2 gap-3 h-full flex-1">
+                                    {formatOptions.map((format) => (
+                                        <button
+                                            key={format.value}
+                                            onClick={() =>
+                                                setMission({
+                                                    ...mission,
+                                                    outputType:
+                                                        format.value as OutputType,
+                                                })
+                                            }
+                                            className={buttonClass(
+                                                mission.outputType ===
+                                                    format.value
+                                            )}
+                                            style={{ height: "100%" }}
+                                        >
+                                            <div className="text-center space-y-2 flex flex-col justify-center h-full">
+                                                <div className="text-2xl">
+                                                    {format.icon}
+                                                </div>
+                                                <div className="font-medium text-white">
+                                                    {format.label}
+                                                </div>
+                                                <div className="text-xs text-gray-400 leading-tight">
+                                                    {format.description}
+                                                </div>
+                                            </div>
+                                        </button>
+                                    ))}
+                                </div>
+                                <div className="flex-1 flex items-end mt-4">
+                                    <div className="invisible">
+                                        Conseil Sharp
+                                    </div>
                                 </div>
                             </div>
                         </div>
